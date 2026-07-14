@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "botc-player"
+version = "0.1.0"
+description = "AI agent desktop app that plays Blood on the Clocktower on botc.app"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "openai>=1.60.0",
+  "requests>=2.32.0",
+  "python-dotenv>=1.0.0",
+  "numpy>=1.26.0",
+  "opencv-python>=4.9.0",
+  "Pillow>=10.0.0",
+  "sounddevice>=0.5.0",
+  "soundfile>=0.12.0",
+  "customtkinter>=5.2.0",
+  "playwright>=1.49.0",
+  "websockets>=13.0",
+  "pydantic>=2.0.0",
+  "pydantic-settings>=2.0.0",
+  "pyvirtualcam>=0.11.0; platform_system != 'Darwin' or platform_machine != 'arm64'",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+botc-player = "botc_player.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+botc_player = ["py.typed", "knowledge/*.md"]

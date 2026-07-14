@@ -1,0 +1,45 @@
+services:
+  botc-player:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: botc-player:latest
+    # Chromium needs shared memory
+    shm_size: "2gb"
+    ports:
+      # Watch the AI + Chromium session in your browser (noVNC)
+      - "6080:6080"
+      # Raw VNC is internal only — host :5900 is often taken by macOS Screen Sharing
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DISPLAY: ":99"
+      DISPLAY_WIDTH: "1600"
+      DISPLAY_HEIGHT: "1000"
+      DOCKER: "1"
+      BOTC_IN_DOCKER: "1"
+      PULSE_SERVER: "unix:/tmp/pulse-socket"
+      # TTS plays into VirtualMic; Chromium mic is BotC_Agent_Mic (remapped from it)
+      AUDIO_OUTPUT_DEVICE: "VirtualMic"
+      # STT listens to game audio on GameOut
+      AUDIO_INPUT_DEVICE: "GameOut"
+
+      XAI_API_KEY: "${XAI_API_KEY:-}"
+      XAI_MODEL: "${XAI_MODEL:-grok-4.5}"
+      XAI_TTS_VOICE: "${XAI_TTS_VOICE:-rex}"
+      TTS_PITCH_SEMITONES: "${TTS_PITCH_SEMITONES:-3}"
+      BOTC_URL: "${BOTC_URL:-https://botc.app}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+    volumes:
+      - botc-logs:/var/log/botc
+      # Live-reload app code / scripts without rebuilding the image
+      - ./src:/app/src:ro
+      - ./scripts:/app/scripts:ro
+    # Default shows join help; override with:
+    #   docker compose run --rm --service-ports botc-player join -u ... -p ... -n ... -l ...
+    # or ./run.sh ...
+    entrypoint: ["/app/scripts/docker-entrypoint.sh"]
+
+volumes:
+  botc-logs:
